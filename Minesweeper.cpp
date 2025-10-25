@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <random>
 using namespace std;
 void game();
@@ -10,35 +10,35 @@ int Random(int min, int max) {
     return dist(gen);
 }
 
-void showb(int n, char b[50][50]) {
+void showb(int field, char playerView[50][50]) {
     cout << " " << endl;
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            cout << b[i][j] << " ";
+    for (int i = 0; i < field; i++) {
+        for (int j = 0; j < field; j++) {
+            cout << playerView[i][j] << " ";
         }
         cout << endl;
     }
 }
 
-void showa(int n, int a[50][50]) {
+void showa(int field, int minesMap[50][50]) {
     cout << " " << endl;
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            cout << a[i][j] << " ";
+    for (int i = 0; i < field; i++) {
+        for (int j = 0; j < field; j++) {
+            cout << minesMap[i][j] << " ";
         }
         cout << endl;
     }
 }
 
-int lose(int n, int a[50][50]) {
+int lose(int field, int minesMap[50][50]) {
     cout << "Field with mines:" << endl;
-    showa(n, a);
+    showa(field, minesMap);
     cout << " " << endl;
     cout << "YOU ARE LOSE!\n1.Play again\n2.Exit" << endl;
-    int v;
+    int choice;
     while (true) {
-        cin >> v;
-        if (v == 1 || v == 2) {
+        cin >> choice;
+        if (choice == 1 || choice == 2) {
             break;
         }
         else {
@@ -49,98 +49,89 @@ int lose(int n, int a[50][50]) {
             cin.ignore(10000, '\n');
         }
     }
-    if (v == 1) {
+    if (choice == 1) {
         game();
     }
-    if (v == 2) {
+    if (choice == 2) {
         exit(0);
     }
     return 0;
 }
 
-void mines(int n, int a[50][50], int& z, int r) {
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            a[i][j] = Random(0, 1);
+void mines(int field, int minesMap[50][50], int& zero, int& one) {
+    zero = 0;
+    one = 0;
+    for (int i = 0; i < field; i++) {
+        for (int j = 0; j < field; j++) {
+            minesMap[i][j] = Random(0, 1);
+            if (minesMap[i][j] == 0) zero++;
+            else one++;
         }
     }
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            if (a[i][j] == 0) {
-                z++;
-            }
-        }
-    }
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            if (a[i][j] == 1) {
-                r++;
-            }
-        }
-    }
+    
 }
 
-void stars(int n, char b[50][50]) {
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            b[i][j] = '*';
+void stars(int field, char playerView[50][50]) {
+    for (int i = 0; i < field; i++) {
+        for (int j = 0; j < field; j++) {
+            playerView[i][j] = '*';
         }
     }
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            cout << b[i][j] << " ";
+    for (int i = 0; i < field; i++) {
+        for (int j = 0; j < field; j++) {
+            cout << playerView[i][j] << " ";
         }
         cout << endl;
     }
 }
 
-void change(int n, int x, int y, int a[50][50], char b[50][50], int& e) {
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
-            if (i == x - 1 && j == y - 1) {
-                if (a[i][j] == 1) {
-                    lose(n, a);
+void change(int field, int choiceX, int choiceY, int minesMap[50][50], char playerView[50][50], int& open) {
+    for (int i = 0; i < field; i++) {
+        for (int j = 0; j < field; j++) {
+            if (i == choiceX - 1 && j == choiceY - 1) {
+                if (minesMap[i][j] == 1) {
+                    lose(field, minesMap);
                 }
-                else if (a[i][j] == 0) {
-                    e++;
-                    int q = 0;
-                    if (i > 0 && a[i - 1][j] != 0) q++;
-                    if (i < n - 1 && a[i + 1][j] != 0) q++;
-                    if (j > 0 && a[i][j - 1] != 0) q++;
-                    if (j < n - 1 && a[i][j + 1] != 0) q++;
-                    if (i > 0 && j > 0 && a[i - 1][j - 1] != 0) q++;
-                    if (i > 0 && j < n - 1 && a[i - 1][j + 1] != 0) q++;
-                    if (i < n - 1 && j > 0 && a[i + 1][j - 1] != 0) q++;
-                    if (i < n - 1 && j < n - 1 && a[i + 1][j + 1] != 0) q++;
-                    b[i][j] = q + '0';
+                else if (minesMap[i][j] == 0) {
+                    open++;
+                    int minesArround = 0;
+                    if (i > 0 && minesMap[i - 1][j] != 0) minesArround++;
+                    if (i < field - 1 && minesMap[i + 1][j] != 0) minesArround++;
+                    if (j > 0 && minesMap[i][j - 1] != 0) minesArround++;
+                    if (j < field - 1 && minesMap[i][j + 1] != 0) minesArround++;
+                    if (i > 0 && j > 0 && minesMap[i - 1][j - 1] != 0) minesArround++;
+                    if (i > 0 && j < field - 1 && minesMap[i - 1][j + 1] != 0) minesArround++;
+                    if (i < field - 1 && j > 0 && minesMap[i + 1][j - 1] != 0) minesArround++;
+                    if (i < field - 1 && j < field - 1 && minesMap[i + 1][j + 1] != 0) minesArround++;
+                    playerView[i][j] = minesArround + '0';
                 }
             }
         }
     }
 }
 
-void win(int z, int e) {
-    if (z == e) {
+void win(int zero, int open) {
+    if (zero == open) {
         cout << "AAAAAAA YOU ARE WIN!!!!!!!!WELL DONE!!!!!!!!!" << endl;
         exit(0);
     }
 }
 
-void examination(int n, int a[50][50], int z, int r) {
-    if (n == z) {
-        mines(n, a, z, r);
+void examination(int field, int minesMap[50][50], int zero, int one) {
+    if (field == zero) {
+        mines(field, minesMap, zero, one);
     }
-    if (n == r) {
-        mines(n, a, z, r);
+    if (field == one) {
+        mines(field, minesMap, zero, one);
     }
 }
 
 void game() {
-    int n, x, y, z = 0, e = 0, r = 0;
+    int field, choiceX, choiceY, zero = 0, open = 0, one = 0;
     while (true) {
         cout << "Enter field size: ";
-        cin >> n;
-        if (n > 1 && n <= 50) {
+        cin >> field;
+        if (field > 1 && field <= 50) {
             break;
         }
         else {
@@ -151,17 +142,17 @@ void game() {
             cin.ignore(10000, '\n');
         }
     }
-    char b[50][50];
-    int a[50][50];
-    stars(n, b);
-    mines(n, a, z, r);
-    examination(n, a, z, r);
+    char playerView[50][50];
+    int minesMap[50][50];
+    stars(field, playerView);
+    mines(field, minesMap, zero, one);
+    examination(field, minesMap, zero, one);
     while (true) {
         cout << " " << endl;
         while (true) {
             cout << "Enter x and y:" << endl;
-            cin >> x >> y;
-            if (x > 0 && y > 0 && x <= n && y <= n) {
+            cin >> choiceX >> choiceY;
+            if (choiceX > 0 && choiceY > 0 && choiceX <= field && choiceY <= field) {
                 break;
             }
             else {
@@ -171,10 +162,10 @@ void game() {
                 cin.ignore(10000, '\n');
             }
         }
-        change(n, x, y, a, b, e);
+        change(field, choiceX, choiceY, minesMap, playerView, open);
         cout << " " << endl;
-        win(z, e);
-        showb(n, b);
+        win(zero, open);
+        showb(field, playerView);
     }
 }
 
